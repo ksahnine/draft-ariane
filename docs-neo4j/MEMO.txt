@@ -1,0 +1,130 @@
+CREATE (FT6:Module {iua: "FT6", label: "FT6"})
+CREATE (BJ8:Module {iua: "BJ8", label: "BJ8"})
+CREATE (DW3:Module {iua: "DW3", label: "DW3"})
+
+CREATE (DW3_ws:DeploymentUnit {iua: "DW3", label: "DW3_ws"})
+CREATE (DW3_batch:DeploymentUnit {iua: "DW3", label: "DW3_Batch"})
+
+MATCH (DW3:Module),(DW3_ws:DeploymentUnit)
+WHERE DW3.label = 'DW3' AND DW3_ws.label = 'DW3_ws'
+CREATE (DW3)-[r:CONTAINS]->(DW3_ws)
+RETURN type(r)
+
+MATCH (DW3:Module),(DW3_batch:DeploymentUnit)
+WHERE DW3.label = 'DW3' AND DW3_batch.label = 'DW3_Batch'
+CREATE (DW3)-[r:CONTAINS]->(DW3_batch)
+RETURN type(r)
+
+MATCH (DW3_ws:DeploymentUnit),(FT6:Module)
+WHERE DW3_ws.label = 'DW3_ws' AND FT6.label = 'FT6'
+CREATE (DW3_ws)-[r:WS_CALL]->(FT6)
+RETURN type(r)
+
+MATCH (DW3_batch:DeploymentUnit),(BJ8:Module)
+WHERE DW3_batch.label = 'DW3_Batch' AND BJ8.label = 'BJ8'
+CREATE (DW3_batch)-[r:WS_CALL]->(BJ8)
+RETURN type(r)
+
+MATCH (n)-[r:CONTAINS]->() DELETE r
+
+MATCH (n:DeploymentUnit)
+DELETE n
+
+Match (n) where ID(n)=21 delete n;
+
+CREATE (FT6_ws)-[:CHILD]->(:Tag{id:tag.parentId})
+
+MATCH (DW3:Module),(DW3_ws:DeploymentUnit)
+WHERE DW3.label = 'DW3' AND DW3_ws.label = 'DW3_ws'
+CREATE (DW3_ws)-[r:CHILD]->(DW3)
+RETURN type(r)
+
+MATCH (DW3:Module),(DW3_batch:DeploymentUnit)
+WHERE DW3.label = 'DW3' AND DW3_batch.label = 'DW3_Batch'
+CREATE (DW3_batch)-[r:CHILD]->(DW3)
+RETURN type(r)
+
+
+call apoc.nodes.group(['*'],['iua']);
+
+#######################################
+
+TOUT SUPPRIMER :
+MATCH (n) DETACH DELETE n
+
+#######################################
+
+CREATE (CP9:Module {iua: "CP9"}), 
+       (BZM:Module {iua: "BZM"}), 
+       (FTO:Module {iua: "FTO"}), 
+       (FT6:Module {iua: "FT6"}), 
+       (EXA:Module {iua: "EXA"}), 
+       (FQ8:Module {iua: "FQ8"}), 
+       (FAP:Module {iua: "FAP"}),
+       (FAF:Module {iua: "FAF"}),
+       (V45:Module {iua: "V45"}),
+       (BMQ:Module {iua: "BMQ"}),
+       (BJ8:Module {iua: "BJ6"}) 
+
+CREATE (CP9_ws:Application {iua: "CP9", type:"ws", name:"referentiel-ws"}), 
+       (CP9_batch:Application {iua: "CP9", type:"batch", name:"batch"}), 
+       (FTO_ws:Application {iua: "FTO", type:"ws", name:"fto-ws"}), 
+       (FT6_ws:Application {iua: "FT6", type:"ws", name:"ft6-ws"}), 
+       (EXA_back:Application {iua: "EXA", type:"ws", name:"exa-ws"}), 
+       (EXA_front:Application {iua: "EXA", type:"front", name:"exa-front"}), 
+       (EXA_batch:Application {iua: "EXA", type:"batch", name:"exa-batch"}), 
+       (FAF_ws:Application {iua: "FAF", type:"ws", name:"faf-ws"}), 
+       (FAP_ws:Application {iua: "FAP", type:"ws", name:"fap-ws"}), 
+       (FQ8_ws:Application {iua: "FQ8", type:"ws", name:"fq8-ws"}), 
+       (FQ8_front:Application {iua: "FQ8", type:"front", name:"fq8-front"}), 
+       (V45_front:Application {iua: "V45", type:"front", name:"v45-front"}), 
+       (BMQ_front:Application {iua: "BMQ", type:"front", name:"bmq-front"}) 
+
+MATCH (a:Module),(b:Application)
+WHERE a.iua = b.iua
+CREATE (a)-[r:CONTAINS]->(b)
+RETURN type(r)
+
+MATCH (n)-[r:CONTAINS]->() SET r.label='CONTAINS'
+
+MATCH (a:Application),(b:Module)
+WHERE a.name='exa-ws' AND b.iua='FAP'
+CREATE (a)-[r:CALL_WS]->(b)
+RETURN type(r)
+
+MATCH (a:Application),(b:Module) WHERE a.name='bmq-front' AND b.iua='CP9' CREATE (a)-[r:CALL_WS]->(b) RETURN type(r)
+
+MATCH (a:Application),(b:Module)
+WHERE a.name='exa-batch' AND b.iua='CP9'
+CREATE (a)-[r:CALL_WS]->(b)
+RETURN type(r)
+
+MATCH (a:Application),(b:Module)
+WHERE a.name='fq8-front' AND b.iua='FAP'
+CREATE (a)-[r:CALL_WS]->(b)
+RETURN type(r)
+
+MATCH (a:Application),(b:Module)
+WHERE a.name='fap-ws' AND b.iua='BJ8'
+CREATE (a)-[r:CALL_WS]->(b)
+RETURN type(r)
+
+MATCH (a:Application),(b:Module)
+WHERE a.name='v45-front' AND b.iua='BJ8'
+CREATE (a)-[r:CALL_WS]->(b)
+RETURN type(r)
+
+MATCH (n)-[r:CALL_WS]->() SET r.label='CONTAINS'
+
+CREATE (Vente:Domain {label: "Vente"}),
+       (Apres_Vente:Domain {label: "Après Vente"}),
+       (Regementaire:Domain {label: "Réglementaire"}),
+       (Referentiel:Domain {label: "Referentiel"}),
+       (MiddleOffice:Domain {label: "Middle Office"}),
+       (Communication:Domain {label: "Communication"})
+
+
+## Filtre graphe des dependances
+match path=(a:Application)-[*]->(:Module) where a.iua='EXA' return path;
+match path=(a:Module)-[*]->() where a.iua='EXA' return path;
+match path=(a:Module)<-[*]-(:Module) where a.iua='CP9' return path;
