@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>DataViz</title>
+        <style type="text/css">
+            #viz {
+                width: 900px;
+                height: 700px;
+            }
+        </style>
+        <script src="neovis.js"></script>
+    </head>   
+    <script>
+        function draw() {
+            var config = {
+                container_id: "viz",
+		neo4j: {
+                	server_url: "bolt://localhost:7687",
+                	server_user: "neo4j",
+                	server_password: "test",
+		},
+		arrows: true,
+		hierarchical: false,
+                labels: {
+                    SystemEntity: {
+                        label: "iua",
+                        group: "zone",
+                        size: "iua",
+			//sizeCypher: "MATCH (n) WHERE id(n) = {id} MATCH (n)<-[r]-() RETURN count(r) AS c"
+                    }
+                },
+                relationships: {
+                    "DEPENDS_ON": {
+                        caption: false,
+                        thickness: "count"
+                    }
+                },
+                initial_cypher: "MATCH (from:SystemEntity)-[:CONTAINS]->(p:ContainerEntity)-[r:CALLS]->(to:SystemEntity) RETURN from, to, apoc.create.vRelationship(from,'DEPENDS_ON',{via:p.name},to) as rel"
+            }
+
+            var viz = new NeoVis.default(config);
+            viz.render();
+        }
+    </script>
+    <body onload="draw()">
+        <div id="viz"></div>
+    </body>
+</html>
