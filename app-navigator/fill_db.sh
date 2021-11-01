@@ -60,3 +60,6 @@ http PUT http://localhost:8080/systems/EXA/calls/CP9?type=ws
 http PUT http://localhost:8080/systems/EXA/calls/BZM?type=ws
 http PUT http://localhost:8080/systems/CP9/calls/FTO?type=ws
 
+http GET http://localhost:8080/systems/EXA
+
+http PUT http://localhost:8080/systems/EXA/relationships/29?type=db

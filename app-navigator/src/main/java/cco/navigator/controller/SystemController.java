@@ -35,6 +35,21 @@ public class SystemController {
     return systemRepository.findOneByIua(iua);
   }
 
+  @PutMapping("/{iua}/relationships/{callId}")
+  SystemEntity majRelationship(@PathVariable String iua,
+                         @PathVariable Long callId,
+                         @RequestParam( name = "type") String type) {
+    SystemEntity systemEntity = systemRepository.findOneByIua(iua);
+    Call call = systemEntity
+        .getCalls()
+        .stream()
+        .filter(
+            rel -> rel.getId().equals(callId)
+        ).findFirst().get();
+    call.setType(type);
+    return systemRepository.save(systemEntity);
+  }
+
   @DeleteMapping("/{iua}")
   void deleteByCodeIua(@PathVariable String iua) {
     SystemEntity systemEntityToDelete = getByCodeIua(iua);

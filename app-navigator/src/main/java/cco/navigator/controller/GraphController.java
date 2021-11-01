@@ -37,16 +37,6 @@ public class GraphController {
     return convertToVisJsDataset(resultQuery);
   }
 
-  @CrossOrigin(origins = "*")
-  @GetMapping("/relationships/from/{iua}")
-  public Map relationshipsFromIua(@PathVariable String iua) {
-    Collection<Map<String, Object>> resultQuery = neo4jClient.query("match path=(o:SystemEntity)-[*]->(a:SystemEntity)-[CONTAINS]->(unit) where a.iua='" + iua + "' return path")
-        .fetch()
-        .all();
-
-    return convertToVisJsDataset(resultQuery);
-  }
-
   private Map<String, Object> convertToVisJsDataset(Collection<Map<String, Object>> resultQuery) {
     Map<String,Object> result = new HashMap<String,Object>();
 
