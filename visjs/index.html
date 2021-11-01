@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Ariane</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="convexhull.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="util.js"
+    ></script>
+    <style type="text/css">
+      body {
+        font-family: 'Ubuntu', sans-serif;
+      }
+      #mynetwork {
+        width: 1000px;
+        height: 800px;
+        border: 1px solid lightgray;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ariane</h1>
+    <div id="mynetwork"></div>
+    <select id="iua">
+      <option value="FTO">FTO</option>
+      <option value="EXA" selected>EXA</option>
+      <option value="CP9">CP9</option>
+      <option value="FQ8">FQ8</option>
+    </select>
+    <button onclick="drawFrom()">Dépendances sortantes</button>
+    <button onclick="drawTo()">Dépendances entrantes</button>
+    <script type="text/javascript">
+
+    const networkGroups = {
+          VENTE: {color:{background:'lightyellow', border:'red'}, borderWidth:3},
+          COMM: {color:{background:'lightgreen'}, borderWidth:3},
+          REF: {color:{background:'lightblue'}, borderWidth:3}
+    };
+
+    var drawNetwork = function(response) {
+      var container = document.getElementById("mynetwork");
+      
+      var nodes = _.map(response.nodes, (node) => {
+        if ( node.artefact === '[ContainerEntity]') {
+          node['color'] = '#d4af37';
+          node['size']  = 18;
+          node['shape'] = 'hexagon';
+        }
+        if ( node.artefact === '[SystemEntity]') {
+          node['borderWidth'] = 2;
+          node['font']        = { size: 16 };
+          node['shape']       = 'circle';
+          node['size']        = 30;
+        }
+        return node;
+      });
+      var edges = _.map(response.edges, (edge) => {
+        if ( edge.relation === 'CONTAINS') {
+          edge.arrows = {to: {enabled: true, type: 'diamond', scaleFactor: '0.5'}};
+        } else {
+          edge.arrows = {to: {enabled: true, type: 'triangle', scaleFactor: '0.8'}};
+        }
+        return _.extend(edge, {width: edge.count});
+      });
+      console.log(edges);
+
+      // create a network
+      var data = {
+        nodes: new vis.DataSet(nodes),
+        edges: new vis.DataSet(edges),
+      };
+      var options = {
+        width: '100%',
+        height: '100%',
+        physics: {
+          enabled: true
+        },
+        //layout: {
+        //  hierarchical: {
+        //    enabled: false,
+        //    sortMethod: 'directed'
+        //  }
+        //},
+        nodes: {
+          font: {
+            face: 'Ubuntu'
+          }
+        },
+        groups: networkGroups
+      };
+      var network = new vis.Network(container, data, options);
+      network.on("beforeDrawing", (ctx) =>
+        afterNetworkDrawing(network, ctx, networkGroups)
+      );
+    };
+
+    function drawFrom() {
+      fetchDataAndDraw('http://localhost:8080/graph/paths/from');
+    }
+
+    function drawTo() {
+      fetchDataAndDraw('http://localhost:8080/graph/paths/to');
+    }
+
+    function fetchDataAndDraw(rootApi) {
+      var iua = document.getElementById('iua').value;
+      fetch(rootApi +'/' + iua, {mode: 'cors'})
+      .then(function(response) {
+        return response.json();
+      })
+      .then(drawNetwork);
+
+    }
+
+    afterNetworkDrawing = (network, ctx, networkGroups) => {
+      const groupsPoints = {};
+      for (const node of network.body.data.nodes.get()) {
+        const nodePosition = network.getPositions([node.id]);
+        if (nodePosition[node.id]) {
+          if (!groupsPoints[node.group]) groupsPoints[node.group] = [];
+          groupsPoints[node.group].push({
+            x: nodePosition[node.id].x,
+            y: nodePosition[node.id].y
+          });
+        }
+      }
+
+      ctx.lineWidth = 1;
+
+      for (const group in groupsPoints) {
+        if ( group === 'NULL') {
+          continue;
+        }
+        const convexPoints = convexHull(groupsPoints[group]);
+        const groupColor = networkGroups[group].color.background;
+        const borderColor = networkGroups[group].color.border;
+        
+        ctx.fillStyle = setRGBAColorAlpha(groupColor, 0.2);
+        ctx.beginPath();
+        ctx.setLineDash([2, 2]); // Tracé du district en pointillés
+        ctx.moveTo(convexPoints[0].x, convexPoints[0].y);
+        for (let i = 1; i < convexPoints.length; i++) {
+          ctx.lineTo(convexPoints[i].x, convexPoints[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = this.setRGBAColorAlpha(borderColor, 0.3);
+        ctx.stroke();
+        ctx.setLineDash([]); // Fin pointillés
+      }
+    };
+
+    </script>
+  </body>
+</html>
