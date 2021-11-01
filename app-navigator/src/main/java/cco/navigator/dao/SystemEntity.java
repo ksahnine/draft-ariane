@@ -1,11 +1,14 @@
 package cco.navigator.dao;
 
+import cco.navigator.dao.relationship.Call;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Node
@@ -20,6 +23,9 @@ public class SystemEntity {
   private Set<ContainerEntity> containers = new HashSet<>();
   @Relationship(type = "DEPENDS_ON", direction = Relationship.Direction.OUTGOING)
   private Set<SystemEntity> dependencies = new HashSet<>();
+  @Relationship(type = "CALLS", direction = Relationship.Direction.OUTGOING)
+  //private Set<SystemEntity> calls = new HashSet<>();
+  private List<Call> calls = new ArrayList<Call>();
 
   public SystemEntity(String iua) {
     this.iua = iua;
@@ -64,5 +70,9 @@ public class SystemEntity {
 
   public void setDependencies(Set<SystemEntity> dependencies) {
     this.dependencies = dependencies;
+  }
+
+  public List<Call> getCalls() {
+    return calls;
   }
 }

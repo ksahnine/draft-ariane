@@ -1,9 +1,11 @@
 http PUT http://localhost:8080/systems iua=CP9 description=Ref_tiers zone=REF
+http PUT http://localhost:8080/systems iua=BZM description=Ref_lien_contrat zone=REF
 http PUT http://localhost:8080/systems iua=FTO description=Ref_transverse_CCO zone=REF
 http PUT http://localhost:8080/systems iua=EX7 description=Restructuration_Avant_Vente zone=VENTE
 http PUT http://localhost:8080/systems iua=EXA description=Ortance zone=VENTE
 http PUT http://localhost:8080/systems iua=FAF description=API_Restructuration zone=VENTE
 http PUT http://localhost:8080/systems iua=FAP description=API_GED zone=COMM
+http PUT http://localhost:8080/systems iua=DPZ description=API_Comm zone=COMM
 http PUT http://localhost:8080/systems iua=FQ8 description=Espace_Regenair zone=VENTE
 http PUT http://localhost:8080/systems iua=EWD description=API_Offre zone=VENTE
 http PUT http://localhost:8080/systems iua=EWE description=API_Assurance zone=VENTE
@@ -11,6 +13,7 @@ http PUT http://localhost:8080/systems iua=EWF description=API_Simulation zone=V
 http PUT http://localhost:8080/systems iua=EWG description=API_Octroi zone=VENTE
 
 http PUT http://localhost:8080/containers name=CP9-referentiel description=Services_recherche type=API
+http PUT http://localhost:8080/containers name=BZM-referentiel description=Services_liens_contrat type=API
 http PUT http://localhost:8080/containers name=FTO-signaletique description=Services_transverses_CCO type=API
 http PUT http://localhost:8080/containers name=EX7-front description=IHM_Restruc type=IHM
 http PUT http://localhost:8080/containers name=EX7-back description=BFF_Restruc type=IHM
@@ -40,14 +43,20 @@ http PUT http://localhost:8080/systems/EWE/contains/EWE-back
 http PUT http://localhost:8080/systems/EWF/contains/EWF-back
 http PUT http://localhost:8080/systems/EWG/contains/EWG-back
 
-http PUT http://localhost:8080/containers/EX7-back/calls/FAF
-http PUT http://localhost:8080/containers/EX7-back/calls/FTO
-http PUT http://localhost:8080/containers/FQ8-back/calls/FAF
-http PUT http://localhost:8080/containers/FQ8-back/calls/FAP
-http PUT http://localhost:8080/containers/EXA-back/calls/FAP
-http PUT http://localhost:8080/containers/EXA-back/calls/EWD
-http PUT http://localhost:8080/containers/EXA-back/calls/EWE
-http PUT http://localhost:8080/containers/EXA-back/calls/EWF
-http PUT http://localhost:8080/containers/EXA-back/calls/EWG
-http PUT http://localhost:8080/containers/EXA-back/calls/FTO
-http PUT http://localhost:8080/containers/EXA-back/calls/CP9
+http PUT http://localhost:8080/systems/EX7/calls/FAF?type=ws
+http PUT http://localhost:8080/systems/EX7/calls/FTO?type=ws
+http PUT http://localhost:8080/systems/FQ8/calls/FAF?type=ws
+http PUT http://localhost:8080/systems/FQ8/calls/FAP?type=ws
+http PUT http://localhost:8080/systems/FQ8/calls/CP9?type=ws
+http PUT http://localhost:8080/systems/FQ8/calls/DPZ?type=ws
+http PUT http://localhost:8080/systems/FQ8/calls/FQ8?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/FAP?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/EWD?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/EWE?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/EWF?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/EWG?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/FTO?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/CP9?type=ws
+http PUT http://localhost:8080/systems/EXA/calls/BZM?type=ws
+http PUT http://localhost:8080/systems/CP9/calls/FTO?type=ws
+

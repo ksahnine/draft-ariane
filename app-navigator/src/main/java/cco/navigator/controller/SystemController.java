@@ -2,6 +2,7 @@ package cco.navigator.controller;
 
 import cco.navigator.dao.ContainerEntity;
 import cco.navigator.dao.SystemEntity;
+import cco.navigator.dao.relationship.Call;
 import cco.navigator.repository.ContainerRepository;
 import org.springframework.web.bind.annotation.*;
 import cco.navigator.repository.SystemRepository;
@@ -58,6 +59,15 @@ public class SystemController {
     systemRepository.save(system);
     return system;
     //systemRepository.addContainer(iua, containerName);
+  }
+
+  @PutMapping("/{iuaFrom}/calls/{iua}")
+  SystemEntity calls(@PathVariable String iuaFrom, @PathVariable String iua, @RequestParam(required = true) String type) {
+    SystemEntity fromSystem = systemRepository.findOneByIua(iuaFrom);
+    SystemEntity toSystem = systemRepository.findOneByIua(iua);
+    fromSystem.getCalls().add(new Call(toSystem, type));
+    systemRepository.save(fromSystem);
+    return fromSystem;
   }
 
   @DeleteMapping
